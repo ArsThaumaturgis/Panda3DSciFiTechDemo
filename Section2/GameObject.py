@@ -83,6 +83,7 @@ class GameObject():
             self.colliderNP = self.root.attachNewNode(PandaNode("stand-in"))
 
         self.deathSound = None
+        self.deathSoundIs3D = False
 
     def physicalImpact(self, surfaceNormal):
         proj = self.velocity.project(surfaceNormal)
@@ -164,6 +165,9 @@ class GameObject():
         if dHealth > 0 and self.health > self.maxHealth and not overcharge:
             self.health = self.maxHealth
         if previousHealth > 0 and self.health <= 0 and self.deathSound is not None:
+            if self.deathSoundIs3D:
+                pos = self.root.getPos()
+                self.deathSound.set3dAttributes(pos.x, pos.y, pos.z, 0, 0, 0)
             self.deathSound.play()
 
     def turnTowards(self, target, priority, dt):

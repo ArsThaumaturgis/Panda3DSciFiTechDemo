@@ -22,3 +22,4 @@ class ShipSpec():
         self.shipModelRotation = 0
         self.shipModelOffset = Vec3(0, 0, 0)
         self.weaponSoundBlastersFileName = ""
+        self.name = ""

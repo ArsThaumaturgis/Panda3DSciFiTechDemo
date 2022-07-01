@@ -2,11 +2,40 @@
 from panda3d.core import Vec4, Vec3, Vec2, Plane, Point3, BitMask32
 from panda3d.core import CollisionSphere, CollisionNode, CollisionRay, CollisionSegment, CollisionHandlerQueue, CollisionTraverser
 
-from Section2.GameObject import GameObject, ArmedObject, ShieldedObject
+from Section2.GameObject import GameObject, ArmedObject, ShieldedObject, FRICTION
+from Section2.Weapon import ProjectileWeapon, Projectile
+from Section2.Explosion import Explosion
 from Section2.CommonValues import *
 import common
 
 import random, math
+
+class BasicEnemyBlaster(ProjectileWeapon):
+    def __init__(self):
+        projectile = Projectile("blasterShotEnemy.egg",
+                                MASK_INTO_PLAYER,
+                                100, 7, 60, 0.5, 0, 0,
+                                0, "blast.egg")
+        ProjectileWeapon.__init__(self, projectile)
+
+        self.firingPeriod = 0.5
+        self.firingDelayPeriod = -1
+        
+        audio3D = common.currentSection.audio3D
+        self.sounds = [
+            audio3D.loadSfx("Assets/Section2/sounds/enemyShot1.ogg"),
+            audio3D.loadSfx("Assets/Section2/sounds/enemyShot2.ogg"),
+            audio3D.loadSfx("Assets/Section2/sounds/enemyShot3.ogg"),
+        ]
+        self.lastSound = None
+
+    def fire(self, owner, dt):
+        ProjectileWeapon.fire(self, owner, dt)
+        sound = random.choice([snd for snd in self.sounds if snd is not self.lastSound])
+        pos = owner.root.getPos(common.base.render)
+        sound.set3dAttributes(pos.x, pos.y, pos.z, 0, 0, 0)
+        sound.play()
+        self.lastSound = sound
 
 class Enemy(GameObject, ArmedObject, ShieldedObject):
     def __init__(self, pos, modelName, maxHealth, maxSpeed, colliderName, size):
@@ -36,6 +65,9 @@ class Enemy(GameObject, ArmedObject, ShieldedObject):
         self.flinchAnims = []
         self.flinchTimer = 0
 
+        self.hurtSound = []
+        self.lastHurtSound = None
+
         self.movementNames = ["walk"]
 
         self.setupExplosion()
@@ -60,6 +92,11 @@ class Enemy(GameObject, ArmedObject, ShieldedObject):
         if self.flinchCounter <= 0:
             self.resetFlinchCounter()
             self.flinch()
+
+        if dHealth < 0:
+            sound = random.choice([snd for snd in self.hurtSound if snd is not self.lastHurtSound])
+            sound.play()
+            self.lastHurtSound = sound
 
     def flinch(self):
         if len(self.flinchAnims) > 0 and self.flinchTimer <= 0:
@@ -87,9 +124,6 @@ class Enemy(GameObject, ArmedObject, ShieldedObject):
     def attackPerformed(self, weapon):
         ArmedObject.attackPerformed(self, weapon)
 
-        if self.attackSound is not None:
-            self.attackSound.play()
-
     def onDeath(self):
         explosion = self.explosion
         self.explosion = None
@@ -103,14 +137,20 @@ class Enemy(GameObject, ArmedObject, ShieldedObject):
         GameObject.destroy(self)
         ShieldedObject.destroy(self)
 
-class FighterEnemy(Enemy):
+class BasicEnemy(Enemy):
     STATE_ATTACK = 0
     STATE_BREAK_AWAY = 1
     STATE_FLEE = 2
-
-    def __init__(self, pos, modelName, maxHealth, maxSpeed, colliderName, size):
-        Enemy.__init__(self, pos, modelName, maxHealth, maxSpeed, colliderName, size)
-
+    
+    def __init__(self):
+        Enemy.__init__(self, Vec3(0, 0, 0),
+                       "enemyFighter.egg",
+                              100,
+                              20,
+                              "enemy",
+                              4)
+        self.actor.setScale(0.5)
+        
         self.acceleration = 100.0
 
         self.turnRate = 300.0
@@ -124,7 +164,7 @@ class FighterEnemy(Enemy):
 
         self.steeringDistance = 80
 
-        self.state = FighterEnemy.STATE_ATTACK
+        self.state = BasicEnemy.STATE_ATTACK
         self.breakAwayTimer = 0
         self.breakAwayMaxDuration = 5
 
@@ -148,10 +188,73 @@ class FighterEnemy(Enemy):
         self.steeringRayNPs.append(steeringNodeNodePath)
 
         self.steeringTraverser.addCollider(steeringNodeNodePath, self.steeringQueue)
+        
+        audio3D = common.currentSection.audio3D
+        self.hurtSound = [
+                audio3D.loadSfx("Assets/Section2/sounds/enemyHit1.ogg"),
+                audio3D.loadSfx("Assets/Section2/sounds/enemyHit2.ogg"),
+                audio3D.loadSfx("Assets/Section2/sounds/enemyHit3.ogg"),
+                audio3D.loadSfx("Assets/Section2/sounds/enemyHit4.ogg")
+            ]
+        for sound in self.hurtSound:
+            sound.setVolume(3)
+            audio3D.attachSoundToObject(sound, self.root)
+
+        self.deathSound = audio3D.loadSfx("Assets/Section2/sounds/enemyDie.ogg")
+        self.deathSound.setVolume(5)
+        self.deathSoundIs3D = True
+
+        weaponPoint = self.actor.find("**/weaponPoint")
+        gun = BasicEnemyBlaster()
+        self.addWeapon(gun, 0, weaponPoint)
+
+        engineNPs = self.actor.findAllMatches("**/engineFlame*")
+        self.engineData = []
+        for np in engineNPs:
+            scale = np.getScale().x
+            np.setScale(1)
+            pos = np.getPos()
+            np.removeNode()
+
+            flame = common.models["shared"]["shipEngineFlame.egg"].copy_to(self.actor)
+            flame.setPos(pos)
+            glow = flame.find("**/glow")
+            glow.setScale(scale, 1, scale)
+            common.make_engine_flame(flame, Vec3(1, 0.75, 0.2), Vec4(1, 0.4, 0.1, 1))
+
+            self.engineData.append((flame, scale))
+
+        landingGearNPs = self.actor.findAllMatches("**/landingGear*")
+        for np in landingGearNPs:
+            np.hide()
+
+        #self.colliderNP.show()
+
+    def setupExplosion(self):
+        shaderInputs = {
+            "duration" : 1.25,
+            "expansionFactor" : 7,
+            "rotationRate" : 0.2,
+            "fireballBittiness" : 1.8,
+            "starDuration" : 0.4
+        }
+
+        randomVec1 = Vec2(random.uniform(0, 1), random.uniform(0, 1))
+        randomVec2 = Vec2(random.uniform(0, 1), random.uniform(0, 1))
+
+        self.explosion = Explosion(25, "explosion", shaderInputs, "noise", randomVec1, randomVec2)
+
+    def update(self, player, dt):
+        Enemy.update(self, player, dt)
+        diff = -self.actor.getQuat(render).getForward()
+        #diff = fire.getRelativeVector(render, diff)
+        for engineFlame, enginePower in self.engineData:
+            fire = engineFlame.find("**/flame")
+            common.update_engine_flame(fire, diff, enginePower)
 
     def runLogic(self, player, dt):
         Enemy.runLogic(self, player, dt)
-
+        
         selfPos = self.root.getPos(common.base.render)
         playerPos = player.root.getPos()
         playerVel = player.velocity
@@ -215,14 +318,14 @@ class FighterEnemy(Enemy):
 
             turned = False
 
-            if self.state == FighterEnemy.STATE_ATTACK:
+            if self.state == BasicEnemy.STATE_ATTACK:
                 if distanceToPlayer < testWeapon.desiredRange*0.3:
-                    self.state = FighterEnemy.STATE_BREAK_AWAY
+                    self.state = BasicEnemy.STATE_BREAK_AWAY
                     self.breakAwayTimer = self.breakAwayMaxDuration
                 else:
                     self.turnTowards(targetPt, 2, dt)
                     turned = True
-            elif self.state == FighterEnemy.STATE_BREAK_AWAY:
+            elif self.state == BasicEnemy.STATE_BREAK_AWAY:
                 self.evasionTimer -= dt
                 if self.evasionTimer <= 0:
                     self.evasionTimer = self.evasionDuration + random.uniform(-self.evasionDurationVariability, self.evasionDurationVariability)
@@ -235,8 +338,8 @@ class FighterEnemy(Enemy):
                     self.turnTowards(selfPos - vectorToPlayer, 2, dt)
                     turned = True
                 if distanceToPlayer > testWeapon.desiredRange*7 or self.breakAwayTimer <= 0:
-                    self.state = FighterEnemy.STATE_ATTACK
-            elif self.state == FighterEnemy.STATE_FLEE:
+                    self.state = BasicEnemy.STATE_ATTACK
+            elif self.state == BasicEnemy.STATE_FLEE:
                 pass
 
             self.steeringTraverser.traverse(common.base.render)
@@ -259,6 +362,8 @@ class FighterEnemy(Enemy):
             self.velocity += forward*self.acceleration*dt
 
     def destroy(self):
+        Enemy.destroy(self)
+        
         if self.explosion is not None:
             self.explosion.destroy()
             self.explosion = None
@@ -269,4 +374,3 @@ class FighterEnemy(Enemy):
         self.steeringRayNPs = []
         self.steeringQueue = None
         Enemy.destroy(self)
-

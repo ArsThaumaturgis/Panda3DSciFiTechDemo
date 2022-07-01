@@ -22,4 +22,6 @@ Assets/Section2/levels/spaceLevel_1.egg.pz
 Assets/Section2/levels/spaceLevel_2.egg.pz
 Assets/Section2/levels/spaceLevel_3.egg.pz
 Assets/Section2/levels/spaceLevel_4.egg.pz
-Assets/Section2/models/STAND_IN/cockpit.egg
+Assets/Section2/models/playerShip_light_cockpit.egg
+Assets/Section2/models/playerShip_med_cockpit.egg
+Assets/Section2/models/playerShip_heavy_cockpit.egg

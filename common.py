@@ -692,20 +692,6 @@ def dismiss_info_text(text_node):
     except:
         print('No info text to dismiss, passing...')
 
-def mirror_ship_parts(model):
-    for left_node in model.find_all_matches("**/*_left*"):
-        right_node = left_node.copy_to(left_node.parent)
-        x, y, z = right_node.get_pos()
-        right_node.set_pos(0., 0., 0.)
-        right_node.flatten_light()  # bake orientation and scale into vertices
-        right_node.set_sx(-1.)
-        right_node.flatten_light()  # bake negative scale into vertices
-        right_node.set_pos(-x, y, z)
-        geom = right_node.children[0].node().modify_geom(0)
-        geom.reverse_in_place()
-
-mirrorShipParts = mirror_ship_parts
-
 models = {"shared": {}, "section1": {}, "section2": {}, "section3": {}, "section4": {}}
 
 def preload_models(model_paths, callback=None):
@@ -716,7 +702,7 @@ def preload_models(model_paths, callback=None):
             section_id = pieces[1]
             filename = pieces[-1]
             models[section_id.lower()][filename] = model
-            print("Loaded", path)
+            print("Loaded", path, "to", section_id.lower())
 
         if callback:
             callback()

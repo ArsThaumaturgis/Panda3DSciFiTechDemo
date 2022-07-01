@@ -103,18 +103,19 @@ float diffuse_function(FunctionParameters func_params) {
 
 void main() {
     vec4 metal_rough = texture2D(p3d_Texture1, v_texcoord);
-    float metallic = clamp(p3d_Material.metallic * metal_rough.b, 0.0, 1.0);
-    float perceptual_roughness = clamp(p3d_Material.roughness * metal_rough.g,  0.0, 1.0);
+    float metallic = clamp(metal_rough.b, 0.0, 1.0);
+    float perceptual_roughness = clamp(metal_rough.g,  0.0, 1.0);
     float alpha_roughness = perceptual_roughness * perceptual_roughness;
-    vec4 base_color = p3d_Material.baseColor * v_color * p3d_ColorScale * texture2D(p3d_Texture0, v_texcoord);
+    vec4 base_color = texture2D(p3d_Texture0, v_texcoord);
     vec3 diffuse_color = (base_color.rgb * (vec3(1.0) - F0)) * (1.0 - metallic);
-    vec3 spec_color = mix(F0, base_color.rgb, metallic);
+    vec3 spec_color = mix(F0, base_color.rgb, metallic) * v_color.xyz;
+    base_color *= v_color * p3d_ColorScale;
 // Normal Mapping
     vec3 n = normalize(v_tbn * (2.0 * texture2D(p3d_Texture2, v_texcoord).rgb - 1.0));
     vec3 v = normalize(-v_position);
 
     float ambient_occlusion = metal_rough.r;
-    vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).rgb;
+    vec3 emission = texture2D(p3d_Texture3, v_texcoord).rgb;
     vec4 color = vec4(vec3(0.0), base_color.a);
 
     for (int i = 0; i < p3d_LightSource.length(); ++i) {

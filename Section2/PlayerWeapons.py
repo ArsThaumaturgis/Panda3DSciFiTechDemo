@@ -18,6 +18,11 @@ import common
 import random, math
 
 class BlasterProjectile(Projectile):
+    SOUND_FILE_NAMES = (
+        "Assets/Section2/sounds/playerBlasterImpact1.ogg",
+        "Assets/Section2/sounds/playerBlasterImpact2.ogg",
+        "Assets/Section2/sounds/playerBlasterImpact3.ogg"
+    )
     def __init__(self, model, mask, range, damage, speed, size, knockback, flinchValue,
                  aoeRadius = 0, blastModel = None,
                  pos = None, damageByTime = False):
@@ -26,17 +31,24 @@ class BlasterProjectile(Projectile):
                              aoeRadius, blastModel,
                              pos, damageByTime)
 
+        self.explosionSound = common.currentSection.audio3D.loadSfx(random.choice(BlasterProjectile.SOUND_FILE_NAMES))
+
     def impact(self, impactee):
         shaderInputs = {
             "duration" : 0.3,
             "expansionFactor" : 1,
         }
 
+        pos = self.root.getPos(common.base.render)
+
         explosion = Explosion(2 + self.damage*0.2, "blasterImpact", shaderInputs, "noiseRadial", random.uniform(0, 3.152), random.uniform(0, 3.152))
-        explosion.activate(Vec3(0, 0, 0), self.root.getPos(common.base.render))
+        explosion.activate(Vec3(0, 0, 0), pos)
         common.currentSection.currentLevel.explosions.append(explosion)
 
         Projectile.impact(self, impactee)
+
+        self.explosionSound.set3dAttributes(pos.x, pos.y, pos.z, 0, 0, 0)
+        self.explosionSound.play()
 
 class BlasterWeapon(ProjectileWeapon):
     MODELS = [
@@ -49,13 +61,19 @@ class BlasterWeapon(ProjectileWeapon):
         7,
         12
     ]
+    SOUND_SPEEDS = [
+        1.25,
+        1.125,
+        1
+    ]
     def __init__(self, powerLevel):
         modelName = BlasterWeapon.MODELS[powerLevel]
         damage = BlasterWeapon.DAMAGE_VALUES[powerLevel]
+        soundSpeed = BlasterWeapon.SOUND_SPEEDS[powerLevel]
         projectile = BlasterProjectile("{0}.egg".format(modelName),
                                         MASK_INTO_ENEMY,
-                                        100, damage, 75, 0.5, 0, 10, 0,
-                                        "blast.egg")
+                                        100, damage, 75, 0.25, 0, 10, 0,
+                                        "blast.egg", soundSpeed)
         ProjectileWeapon.__init__(self, projectile)
 
         self.firingPeriod = 0.2
@@ -63,9 +81,12 @@ class BlasterWeapon(ProjectileWeapon):
 
         self.energyCost = 1
 
+        self.soundSpeed = soundSpeed
+
     def fire(self, owner, dt):
         if owner.energy > self.energyCost:
-            ProjectileWeapon.fire(self, owner, dt)
+            proj = ProjectileWeapon.fire(self, owner, dt)
+            proj.explosionSound.setPlayRate(self.soundSpeed)
             owner.alterEnergy(-self.energyCost)
             owner.attackPerformed(self)
 
@@ -96,6 +117,8 @@ class Rocket(SeekingProjectile):
 
         self.timer = 5
 
+        self.explosionSound = common.currentSection.audio3D.loadSfx("Assets/Section2/sounds/playerRocketHit.ogg")
+
     def update(self, dt):
         SeekingProjectile.update(self, dt)
 
@@ -115,11 +138,16 @@ class Rocket(SeekingProjectile):
         randomVec1 = Vec2(random.uniform(0, 1), random.uniform(0, 1))
         randomVec2 = Vec2(random.uniform(0, 1), random.uniform(0, 1))
 
+        pos = self.root.getPos(common.base.render)
+
         explosion = Explosion(7, "explosion", shaderInputs, "noise", randomVec1, randomVec2)
-        explosion.activate(Vec3(0, 0, 0), self.root.getPos(common.base.render))
+        explosion.activate(Vec3(0, 0, 0), pos)
         common.currentSection.currentLevel.explosions.append(explosion)
 
         SeekingProjectile.impact(self, impactee)
+
+        self.explosionSound.set3dAttributes(pos.x, pos.y, pos.z, 0, 0, 0)
+        self.explosionSound.play()
 
 class RocketWeapon(ProjectileWeapon):
     def __init__(self):

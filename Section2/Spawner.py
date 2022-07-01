@@ -14,6 +14,9 @@ class Spawner():
 
         self.objIsEnemy = objIsEnemy
 
+        self.spawnEffect = None
+        self.spawnSound = None
+
         self.isReady = True
 
     def destroy(self):

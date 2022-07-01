@@ -13,6 +13,7 @@ from direct.actor.Actor import Actor
 from panda3d.core import OmniBoundingVolume
 from panda3d.core import Mat4
 from panda3d.core import AudioSound
+from panda3d.core import VirtualFileSystem
 
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.DirectGui import DirectLabel
@@ -64,7 +65,6 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         self.dustMovementOffset = 0
 
         self.thirdPersonShip = sharedModels[shipSpec.shipModelFileLowPoly].copyTo(self.actor)
-        common.mirrorShipParts(self.thirdPersonShip)
         self.thirdPersonShip.setScale(shipSpec.shipModelScalar*0.5)
         self.thirdPersonShip.setH(shipSpec.shipModelRotation)
         self.thirdPersonShip.setPos(shipSpec.shipModelOffset*shipSpec.shipModelScalar*0.5)
@@ -248,6 +248,7 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         cardMaker.setFrame(-1, 1, 0, 1)
 
         self.cockpit = section2Models[shipSpec.cockpitModelFile]
+        self.cockpit.setScale(shipSpec.shipModelScalar*0.5)
         self.cockpit.reparentTo(self.actor)
 
         bounds = self.thirdPersonShip.getTightBounds()
@@ -395,19 +396,46 @@ class Player(GameObject, ArmedObject, ShieldedObject):
 
         self.deathFireTimer = 2.5
         self.deathFlameTimer = 0
+        
+        audio3D = common.currentSection.audio3D
+        audio3D.attachListener(self.root)
 
         self.deathSound = common.base.loader.loadSfx("Assets/Section2/sounds/playerDie.ogg")
-        self.hurtSound = common.base.loader.loadSfx("Assets/Section2/sounds/playerHit.ogg")
+        self.hurtSound = [
+                audio3D.loadSfx("Assets/Section2/sounds/playerHit1.ogg"),
+                audio3D.loadSfx("Assets/Section2/sounds/playerHit2.ogg"),
+                audio3D.loadSfx("Assets/Section2/sounds/playerHit3.ogg")
+            ]
+        for sound in self.hurtSound:
+            audio3D.attachSoundToObject(sound, self.root)
+        self.lastHurtSound = None
         self.engineSound = common.base.loader.loadSfx("Assets/Section2/sounds/playerEngine.ogg")
         self.engineSound.setLoop(True)
         self.engineSound.setPlayRate(1.5 - 0.5*((shipSpec.acceleration*shipSpec.acceleration) / (60*60)))
         self.engineSound.setVolume((shipSpec.acceleration*shipSpec.acceleration) / (60*60))
 
-        self.weaponSoundBlasters = common.base.loader.loadSfx(shipSpec.weaponSoundBlastersFileName)
+        self.weaponSoundBlasters = []
+        self.weaponSoundBlastersLast = None
+        working = True
+        counter = 1
+        vfs = VirtualFileSystem.getGlobalPtr()
+        while working:
+            blasterFile = shipSpec.weaponSoundBlastersFileName + str(counter) + ".ogg"
+            if vfs.exists(blasterFile):
+                sound = common.base.loader.loadSfx(blasterFile)
+                self.weaponSoundBlasters.append(sound)
+                counter += 1
+            else:
+                working = False
         self.weaponSoundBlastersPlayedThisFrame = False
 
-        self.weaponSoundRockets = common.base.loader.loadSfx("Assets/Section2/sounds/playerAttackRocket.ogg")
-        self.weaponSoundRocketsPlayedThisFrame = False
+        self.weaponSoundRockets = [
+            common.base.loader.loadSfx("Assets/Section2/sounds/playerAttackRocket1.ogg"),
+            common.base.loader.loadSfx("Assets/Section2/sounds/playerAttackRocket2.ogg"),
+            common.base.loader.loadSfx("Assets/Section2/sounds/playerAttackRocket3.ogg"),
+            common.base.loader.loadSfx("Assets/Section2/sounds/playerAttackRocket4.ogg")
+            ]
+        self.weaponSoundRocketsLast = None
 
     def updateCameraLens(self):
         verticalFOV = 105
@@ -472,7 +500,7 @@ class Player(GameObject, ArmedObject, ShieldedObject):
             self.cameraTarget.setY(0)
             self.cameraTarget.setZ(0)
             common.base.camera.setPos(self.actor, -self.thirdPersonCameraPos*0.5)
-            self.cameraSpeedScalar = 90
+            self.cameraSpeedScalar = 230
             self.cockpit.show()
             self.thirdPersonShip.hide()
 
@@ -590,7 +618,6 @@ class Player(GameObject, ArmedObject, ShieldedObject):
 
     def update(self, keys, dt):
         self.weaponSoundBlastersPlayedThisFrame = False
-        self.weaponSoundRocketsPlayedThisFrame = False
 
         if self.health <= 0:
             self.updateDeathCutscene(dt)
@@ -649,7 +676,7 @@ class Player(GameObject, ArmedObject, ShieldedObject):
                     flame.show()
                 fire = flame.find("**/flame")
 
-                diff = self.thirdPersonShip.getQuat(render).getForward()
+                diff = -self.thirdPersonShip.getQuat(render).getForward()
                 #diff = self.thirdPersonShip.getRelativeVector(render, diff)
 
                 common.update_engine_flame(fire, diff, newScale)
@@ -831,12 +858,20 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         ArmedObject.attackPerformed(self, weapon)
         if weapon.__class__ == BlasterWeapon:
             if not self.weaponSoundBlastersPlayedThisFrame:
+                if len(self.weaponSoundBlasters) > 1:
+                    sound = random.choice([snd for snd in self.weaponSoundBlasters if snd is not self.weaponSoundBlastersLast])
+                else:
+                    sound = self.weaponSoundBlasters[0]
+                sound.play()
+                self.weaponSoundBlastersLast = sound
                 self.weaponSoundBlastersPlayedThisFrame = True
-                self.weaponSoundBlasters.play()
         elif weapon.__class__ == RocketWeapon:
-            if not self.weaponSoundRocketsPlayedThisFrame:
-                self.weaponSoundRocketsPlayedThisFrame = True
-                self.weaponSoundRockets.play()
+            if len(self.weaponSoundRockets) > 1:
+                sound = random.choice([snd for snd in self.weaponSoundRockets if snd is not self.weaponSoundRocketsLast])
+            else:
+                sound = self.weaponSoundRockets[0]
+            sound.play()
+            self.weaponSoundRocketsLast = sound
 
     def postTraversalUpdate(self, dt):
         ArmedObject.update(self, dt)
@@ -855,7 +890,9 @@ class Player(GameObject, ArmedObject, ShieldedObject):
             self.shields = []
 
         if dHealth < 0:
-            self.hurtSound.play()
+            sound = random.choice([snd for snd in self.hurtSound if snd is not self.lastHurtSound])
+            sound.play()
+            self.lastHurtSound = sound
 
     def alterEnergy(self, dEnergy):
         self.energy += dEnergy

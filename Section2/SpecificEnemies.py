@@ -1,5 +1,5 @@
 
-from Section2.EnemyShips import *
+from Section2.Enemy import *
 
 spawnableDict = {
     "basic enemy" : BasicEnemy,

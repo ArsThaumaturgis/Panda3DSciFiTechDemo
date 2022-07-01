@@ -9,6 +9,7 @@ from panda3d.core import AmbientLight
 from panda3d.core import CompassEffect
 from panda3d.core import OmniBoundingVolume
 from panda3d.core import AudioSound
+from direct.showbase import Audio3DManager
 
 from direct.gui.DirectGui import *
 
@@ -17,7 +18,6 @@ from Section2.Player import *
 from Section2.Enemy import *
 from Section2.Level import Level
 from Section2.EndPortal import SphericalPortalSystem
-from Section2.intro import Intro
 
 import common
 from common import KeyBindings
@@ -62,6 +62,9 @@ class Section2():
 
         KeyBindings.setHandler("openPauseMenu", common.gameController.openPauseMenu, "section2")
         KeyBindings.setHandler("toggleThirdPerson", self.toggleThirdPerson, "section2")
+
+        self.audio3D = Audio3DManager.Audio3DManager(common.base.sfxManagerList[0], common.base.render)
+        self.audio3D.setDropOffFactor(0.04)
 
         self.pusher = CollisionHandlerPusher()
         self.traverser = CollisionTraverser()
@@ -168,12 +171,6 @@ class Section2():
         self.playState = Section2.STATE_PLAYING
 
         self.activated()
-
-        # Preload the models for Section 3.
-
-        with open("Section3/models.txt") as model_path_file:
-            model_paths = [path.replace("\r", "").replace("\n", "") for path in model_path_file]
-        common.preload_models(model_paths)
 
     def resumeGame(self):
         self.activated()
@@ -298,7 +295,7 @@ class Section2():
             self.currentLevel.triggerActivated(trigger)
 
     def exitTriggered(self):
-        common.gameController.startSectionIntro(2, self.shipSpec, show_loading_screen=False)
+        common.gameController.showEndCutscene()
 
     def cleanupLevel(self):
         if self.player is not None:
@@ -339,9 +336,6 @@ class Section2():
         section2Models.clear()
         common.currentSection = None
 
-def startIntro(data, show_loading_screen):
-    Intro(data, show_loading_screen)
-
 def initialise(shipSpec):
     game = Section2("Assets/Section2/music/space_tech_break.mp3",
                     "Assets/Section2/music/space_tech_interlude_full.mp3")
@@ -365,4 +359,4 @@ KeyBindings.add("shootDone", "mouse1-up", "section2")
 KeyBindings.add("shootSecondary", "mouse3", "section2")
 KeyBindings.add("shootSecondaryDone", "mouse3-up", "section2")
 KeyBindings.add("openPauseMenu", "escape", "section2")
-KeyBindings.add("toggleThirdPerson", "\\", "section2")
+KeyBindings.add("toggleThirdPerson", "tab", "section2")

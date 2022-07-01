@@ -30,6 +30,7 @@ class TitleScreen:
             screen.detach_node()
             demo = demo_class()
             window_updater(demo, common.base.win)
+            demo.mainMenuMusic.play()
 
         with open("models.txt") as model_path_file:
             model_paths = [path.replace("\r", "").replace("\n", "") for path in model_path_file]

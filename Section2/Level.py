@@ -4,12 +4,15 @@ from panda3d.core import Vec3, Vec4, DirectionalLight, Filename, VirtualFileSyst
 from Section2.GameObject import *
 from Section2.Trigger import Trigger
 from Section2.Spawner import Spawner
+from Section2.Explosion import Explosion
 import Section2.SpecificEnemies as SpecificEnemies
 
 from Section2 import TagHandler
 import common
 
 import importlib
+
+import random
 
 from panda3d.core import TextNode
 
@@ -134,6 +137,9 @@ class Level():
 
             spawnableData, isEnemy = self.registeredSpawnables[id]
             spawner = Spawner(spawnableData, pos, h, isEnemy)
+            spawner.spawnEffect = Explosion(25, "spawn", {"duration" : 1.5}, "noise", random.uniform(0, 1), random.uniform(0, 1))
+            audio3D = common.currentSection.audio3D
+            spawner.spawnSound = audio3D.loadSfx("Assets/Section2/sounds/enemySpawn.ogg")
 
             self.spawners[spawnerName] = spawner
             if spawnerGroupName is not None and len(spawnerGroupName) > 0:
@@ -154,11 +160,22 @@ class Level():
             return
 
         obj = spawner.spawnObj
+        obj.spawned()
         spawner.spawnObj = None
         spawner.isReady = False
 
         if spawner.objIsEnemy:
+            objPos = obj.root.getPos(common.base.render)
             self.enemies.append(obj)
+            spawnEffect = spawner.spawnEffect
+            if spawnEffect is not None:
+                spawnEffect.activate(Vec3(0, 0, 0), objPos)
+                self.explosions.append(spawnEffect)
+            spawnSound = spawner.spawnSound
+            if spawnSound is not None:
+                spawnSound.set3dAttributes(objPos.x, objPos.y, objPos.z, 0, 0, 0)
+                spawnSound.setVolume(5)
+                spawnSound.play()
             #obj.actor.play("spawn")
         else:
             if obj.auraName is not None:
