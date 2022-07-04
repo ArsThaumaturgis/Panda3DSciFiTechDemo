@@ -348,16 +348,25 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         self.radarDrawerNP.setLightOff()
         self.radarDrawerNP.setDepthWrite(False)
         self.radarDrawerNP.setTransparency(True)
+        self.radarDrawerNP.setDepthOffset(1)
+        self.radarDrawerNP.node().setBounds(OmniBoundingVolume())
+        self.radarDrawerNP.node().setFinal(True)
         self.applyUIShader(self.radarDrawerNP, Vec3(1, 1, 1), Vec3(1, 1, 1), 0.5, 0.2, 1)
 
         self.healthBar = self.healthBarRoot.attachNewNode(cardMaker.generate())
         self.healthBar.setSx(0.05)
         self.healthBar.setTransparency(True)
+        self.healthBar.setDepthOffset(1)
+        self.healthBar.node().setBounds(OmniBoundingVolume())
+        self.healthBar.node().setFinal(True)
         self.applyUIShader(self.healthBar, backingColourTop, backingColourBottom, 0.2, 0.5, self.healthBar.getSx()*2 / barBacking.getSz())
 
         self.energyBar = self.energyBarRoot.attachNewNode(cardMaker.generate())
         self.energyBar.setSx(0.05)
         self.energyBar.setTransparency(True)
+        self.energyBar.setDepthOffset(1)
+        self.energyBar.node().setBounds(OmniBoundingVolume())
+        self.energyBar.node().setFinal(True)
         self.applyUIShader(self.energyBar, backingColourTop, backingColourBottom, 0.2, 0.5, self.energyBar.getSx()*2 / barBacking.getSz())
 
         self.missileCounter = DirectLabel(text = "",
@@ -371,6 +380,9 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         self.missileCounter.setShaderOff(10)
         self.missileCounter.setBin("unsorted", 0)
         self.missileCounter.setLightOff()
+        self.missileCounter.setDepthOffset(1)
+        self.missileCounter.node().setBounds(OmniBoundingVolume())
+        self.missileCounter.node().setFinal(True)
 
         self.speedometer = DirectLabel(text = "",
                                        text_mayChange = True,
@@ -383,6 +395,9 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         self.speedometer.setShaderOff(10)
         self.speedometer.setBin("unsorted", 0)
         self.speedometer.setLightOff()
+        self.speedometer.setDepthOffset(1)
+        self.speedometer.node().setBounds(OmniBoundingVolume())
+        self.speedometer.node().setFinal(True)
 
         self.updateHealthUI()
         self.updateEnergyUI()

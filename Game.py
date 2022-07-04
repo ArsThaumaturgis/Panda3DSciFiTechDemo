@@ -38,7 +38,7 @@ def buildOptionsMenu(gameRef):
     gameRef.addOptionHeading("Technical")
     gameRef.addOptionSlider("Music Volume", (0, 100), 1, "musicVolume", "general", 40, gameRef.setMusicVolume)
     gameRef.addOptionSlider("Sound Volume", (0, 100), 1, "soundVolume", "general", 75, gameRef.setSoundVolume)
-    gameRef.addOptionMenu("Resolution", gameRef.resolutionList, "resolution", "general", "1024 768", gameRef.setResolution)
+    gameRef.addOptionMenu("Resolution", gameRef.resolutionList, "resolution", "general", "1024 x 768", gameRef.setResolution)
 
 class Game():
     BUTTON_SIZE_LARGE = 0

@@ -160,7 +160,6 @@ class Level():
             return
 
         obj = spawner.spawnObj
-        obj.spawned()
         spawner.spawnObj = None
         spawner.isReady = False
 
