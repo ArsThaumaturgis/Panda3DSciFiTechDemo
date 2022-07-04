@@ -1,23 +1,17 @@
-Project Samples
+A small showcase game for the Panda3D engine, made by members of the community.
 
-![image](https://user-images.githubusercontent.com/3117958/141377792-b2c30954-b7b3-4e2d-888c-e483af0696be.png)
+Screenshots:
 
-![image](https://user-images.githubusercontent.com/3117958/141377828-272f1f89-9ee2-4a3c-abcd-12644a1c147d.png)
+![Screenshot from 2022-07-04 21-29-56](https://user-images.githubusercontent.com/36933600/177210454-ceec230f-008b-4237-a3ca-13d57128e9ad.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377835-ce9d2339-53ea-46fa-9aa9-9973b1410d0a.png)
+![Screenshot from 2022-07-04 21-27-06](https://user-images.githubusercontent.com/36933600/177209278-e87f7242-6853-4b9a-9fbe-844a5c542fad.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377858-6be8ac31-440d-494a-a83c-d07585d15f67.png)
+![Screenshot from 2022-07-04 21-27-24](https://user-images.githubusercontent.com/36933600/177209303-6f14c4e5-47b0-4fc1-b06c-5ada8ee7969b.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377881-f4d7f015-bfd5-42da-829c-d1f5daa2ed0a.png)
+![Screenshot from 2022-07-04 21-45-01](https://user-images.githubusercontent.com/36933600/177210485-560b2b97-d5f7-484e-911e-5adbf82277dd.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377906-3fab056f-3d54-410a-a6b5-baca16f56ae0.png)
+![Screenshot from 2022-07-04 21-42-42](https://user-images.githubusercontent.com/36933600/177210491-e01edecb-acba-44f9-a5f3-594dac312227.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377928-d2a4ad23-6ebe-45a2-88f6-30fd7db5b6a9.png)
+![Screenshot from 2022-07-04 21-28-48](https://user-images.githubusercontent.com/36933600/177210541-7fb76ebe-489a-4048-bd8e-09415921df5f.png)
 
-![image](https://user-images.githubusercontent.com/3117958/141377947-0f1d3223-9588-4909-b12a-6888cdd38cf5.png)
-
-![image](https://user-images.githubusercontent.com/3117958/141377960-0c589892-3122-4d3e-ac85-3e36323aaab2.png)
-
-![image](https://user-images.githubusercontent.com/3117958/141377975-b0104825-54fc-4d11-81c0-5cbb7f847670.png)
-
-![image](https://user-images.githubusercontent.com/3117958/141377989-d5b3e7b8-30fe-4e92-b902-72f675712be0.png)
+![Screenshot from 2022-07-04 21-38-54](https://user-images.githubusercontent.com/36933600/177210549-8b7959b5-33c1-4b8a-813a-95684009d63b.png)
