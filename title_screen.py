@@ -6,6 +6,8 @@ import common
 class TitleScreen:
 
     def __init__(self, demo_class, window_updater, option_dir, option_filename):
+        properties = WindowProperties()
+        properties.setTitle("Captain Panda and the Invasion of the Mechanoids--\"Across the Night\"")
         try:
             with open(f"{option_dir}/{option_filename}") as option_file:
                 for line in option_file:
@@ -13,12 +15,11 @@ class TitleScreen:
                     option_id = option_id.strip()
                     if option_id == "resolution":
                         w, h = option_value.split(" x ")
-                        properties = WindowProperties()
                         properties.set_size(int(w), int(h))
-                        common.base.win.request_properties(properties)
                         break
         except FileNotFoundError as e:
             pass
+        common.base.win.request_properties(properties)
 
         cm = CardMaker("loading_screen")
         cm.set_frame_fullscreen_quad()

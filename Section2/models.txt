@@ -1,6 +1,5 @@
 Assets/Shared/models/player_mothership.gltf
 Assets/Shared/models/portal_generator.gltf
-Assets/Shared/models/test_completed_ship_a.gltf
 Assets/Shared/models/shipEngineFlame.egg
 Assets/Shared/models/wrecked_tunnel.gltf
 Assets/Section2/models/wrecked_tunnel_collision.gltf

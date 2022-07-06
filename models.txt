@@ -1,5 +1,4 @@
-Assets/Shared/models/starship_b_for_wire.gltf
-Assets/Shared/models/starship_c_for_wire.gltf
 Assets/Shared/models/playerShip_light.egg
 Assets/Shared/models/playerShip_med.egg
 Assets/Shared/models/playerShip_heavy.egg
+Assets/Shared/models/portal_generator.gltf
