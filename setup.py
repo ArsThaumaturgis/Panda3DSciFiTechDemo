@@ -27,7 +27,9 @@ setup(
                 "dist/*",
                 ".git/*",
                 "*__pychache__*",
-                "README.md"
+                "README.md",
+                "requirements.txt",
+                "setup.py"
             ],
             "gui_apps" : {
                 "Captain Panda--Across the Night" : "Game.py"
@@ -46,9 +48,6 @@ setup(
                 #"macosx_10_6_x86_64",
                 "win_amd64"
             ],
-            "file_handlers" : {
-                ".gltf" : egg2bam,
-            },
             "log_filename" : "$USER_APPDATA/CptPanda_AcrossNight/output.log",
             "log_append" : False
         }
