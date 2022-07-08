@@ -337,8 +337,8 @@ class Section2():
         common.currentSection = None
 
 def initialise(shipSpec):
-    game = Section2("Assets/Section2/music/space_tech_break.mp3",
-                    "Assets/Section2/music/space_tech_interlude_full.mp3")
+    game = Section2("Assets/Section2/music/space_tech_break.ogg",
+                    "Assets/Section2/music/space_tech_interlude_full.ogg")
     game.startGame(shipSpec)
     KeyBindings.activateAll("section2")
     KeyBindings.activateAll("text")

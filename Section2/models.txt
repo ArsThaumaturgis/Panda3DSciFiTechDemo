@@ -1,8 +1,7 @@
-Assets/Shared/models/player_mothership.gltf
-Assets/Shared/models/portal_generator.gltf
+Assets/Shared/models/portal_generator.bam
 Assets/Shared/models/shipEngineFlame.egg
-Assets/Shared/models/wrecked_tunnel.gltf
-Assets/Section2/models/wrecked_tunnel_collision.gltf
+Assets/Shared/models/wrecked_tunnel.bam
+Assets/Section2/models/wrecked_tunnel_collision.bam
 Assets/Section2/models/bigShield.egg
 Assets/Section2/models/blast.egg
 Assets/Section2/models/blasterShot_large.egg

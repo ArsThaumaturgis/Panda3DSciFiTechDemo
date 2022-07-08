@@ -11,6 +11,7 @@ setup(
                 "**/*.txt",
                 "**/*.egg",
                 "**/*.egg.pz",
+                "**/*.bam",
                 "**/*.gltf",
                 "**/*.dat",
                 "**/*.cur",
@@ -43,7 +44,7 @@ setup(
             "platforms" : [
                 "manylinux1_x86_64",
                 #"macosx_10_6_x86_64",
-                #"win_amd64"
+                "win_amd64"
             ],
             "file_handlers" : {
                 ".gltf" : egg2bam,

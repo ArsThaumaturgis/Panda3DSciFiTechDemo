@@ -1,4 +1,4 @@
 Assets/Shared/models/playerShip_light.egg
 Assets/Shared/models/playerShip_med.egg
 Assets/Shared/models/playerShip_heavy.egg
-Assets/Shared/models/portal_generator.gltf
+Assets/Shared/models/portal_generator.bam
