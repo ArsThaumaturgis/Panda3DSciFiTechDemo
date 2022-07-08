@@ -42,12 +42,6 @@ class Level():
 
         TagHandler.handleGeometryTags(self.geometry)
 
-        try:
-            self.scriptObj = importlib.import_module("Assets.Section2.levels.scripts.{0}".format(levelFile))
-        except ImportError as e:
-            print ("Error importing script-file " + levelFile)
-            print (e)
-
         self.enemies = []
 
         self.deadEnemies = []
@@ -200,8 +194,8 @@ class Level():
             self.triggers.append(trigger)
 
     def triggerActivated(self, trigger):
-        if hasattr(self.scriptObj, trigger.callbackName):
-            getattr(self.scriptObj, trigger.callbackName)(self)
+        if hasattr(self, trigger.callbackName):
+            getattr(self, trigger.callbackName)()
         if trigger.onlyOnce:
             trigger.active = False
 

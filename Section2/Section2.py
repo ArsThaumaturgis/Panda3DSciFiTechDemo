@@ -16,7 +16,7 @@ from direct.gui.DirectGui import *
 from Section2.GameObject import *
 from Section2.Player import *
 from Section2.Enemy import *
-from Section2.Level import Level
+from Section2.SpaceLevel import SpaceLevel
 from Section2.EndPortal import SphericalPortalSystem
 
 import common
@@ -142,7 +142,7 @@ class Section2():
 
         self.shipSpec = shipSpec
 
-        self.currentLevel = Level("spaceLevel")
+        self.currentLevel = SpaceLevel()
 
         self.player = Player(shipSpec)
         self.player.root.setPos(self.currentLevel.playerSpawnPoint)

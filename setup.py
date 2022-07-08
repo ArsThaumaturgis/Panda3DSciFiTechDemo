@@ -19,7 +19,6 @@ setup(
                 "**/*.vert",
                 "**/*.frag",
                 "Assets/Shared/fonts/*",
-                "Assets/Section2/levels/scripts/*"
             ],
 			"exclude_patterns" : [
                 "ModelViewer/*",
@@ -46,6 +45,9 @@ setup(
                 #"macosx_10_6_x86_64",
                 #"win_amd64"
             ],
+            "file_handlers" : {
+                ".gltf" : egg2bam,
+            },
             "log_filename" : "$USER_APPDATA/CptPanda_AcrossNight/output.log",
             "log_append" : False
         }
