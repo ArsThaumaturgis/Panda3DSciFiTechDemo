@@ -128,7 +128,7 @@ class Game():
 
         ### Main Menu
 
-        self.mainMenuMusic = common.base.loader.loadMusic("Assets/Section2/music/space_tech_next_short.mp3")
+        self.mainMenuMusic = common.base.loader.loadMusic("Assets/Section2/music/space_tech_next_short.ogg")
         self.mainMenuMusic.setVolume(0.75)
         self.mainMenuMusic.setLoop(True)
         self.mainMenuMusic.setTime(11)
