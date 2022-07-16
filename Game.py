@@ -12,7 +12,8 @@ from panda3d.core import (
     CardMaker,
     ModelPool,
     CullFaceAttrib,
-    DirectionalLight
+    DirectionalLight,
+    AntialiasAttrib
 )
 from direct.stdpy.file import *
 from direct.gui.DirectGui import *
@@ -39,6 +40,7 @@ def buildOptionsMenu(gameRef):
     gameRef.addOptionSlider("Music Volume", (0, 100), 1, "musicVolume", "general", 40, gameRef.setMusicVolume)
     gameRef.addOptionSlider("Sound Volume", (0, 100), 1, "soundVolume", "general", 75, gameRef.setSoundVolume)
     gameRef.addOptionMenu("Resolution", gameRef.resolutionList, "resolution", "general", "1280 x 720", gameRef.setResolution)
+    gameRef.addOptionCheck("Antialiasing (16x MSAA)\n(May have little or no effect with some systems)", "antialiasing", "general", True, gameRef.setAntialiasing)
 
 class Game():
     BUTTON_SIZE_LARGE = 0
@@ -559,7 +561,7 @@ class Game():
         model.setDepthWrite(True)
         model.setAttrib(CullFaceAttrib.make(CullFaceAttrib.MCullClockwise))
         model.setShader(common.metal_shader)
-        model.setScale(common.base.aspect2d, 0.075)
+        model.setScale(0.075)
         self.loadingModel = model
 
         ### End-of-game "cutscene"
@@ -1017,6 +1019,13 @@ class Game():
 
         self.updateTitleForWindowSize(w, h)
 
+    def setAntialiasing(self, antialias):
+        common.base.render.clearAntialias()
+        if antialias:
+            common.base.render.setAntialias(AntialiasAttrib.MMultisample)
+        else:
+            common.base.render.setAntialias(AntialiasAttrib.MNone)
+
     def updateTitleForWindowSize(self, w, h):
         ratio = w / h
         ratio = ratio / 1.777777777778
@@ -1165,14 +1174,17 @@ class Game():
 
         ship1 = model.instanceUnderNode(self.loading_screen, "ship1")
         ship1.setX(aspect2d, -1.25)
+        ship1.setScale(aspect2d, 1)
 
         ship2 = model.instanceUnderNode(self.loading_screen, "ship2")
         ship2.setX(aspect2d, 1.25)
         ship2.setH(180)
+        ship2.setScale(aspect2d, 1)
 
         ship3 = model.instanceUnderNode(self.loading_screen, "ship3")
         ship3.setX(0)
         ship3.setH(90)
+        ship3.setScale(aspect2d, 1)
 
         text = TextNode("ship label")
         text.setText("Mechanoid Rocketship")

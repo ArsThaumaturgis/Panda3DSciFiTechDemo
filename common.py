@@ -16,7 +16,7 @@ load_prc_file_data("",
 sync-video false
 fullscreen false
 framebuffer-multisample 1
-multisamples 4
+multisamples 16
 """)
 
 

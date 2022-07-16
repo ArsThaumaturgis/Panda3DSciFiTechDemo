@@ -1,4 +1,5 @@
 section2 | useNewtonianFlight | True
 general | musicVolume | 40.0
 general | soundVolume | 75.0
-general | resolution | 1360 x 768
+general | resolution | 1280 x 720
+general | antialiasing | True
