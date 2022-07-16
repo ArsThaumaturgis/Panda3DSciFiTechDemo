@@ -250,6 +250,8 @@ class Player(GameObject, ArmedObject, ShieldedObject):
         self.cockpit = section2Models[shipSpec.cockpitModelFile]
         self.cockpit.setScale(shipSpec.shipModelScalar*0.5)
         self.cockpit.reparentTo(self.actor)
+        self.cockpit.node().setBounds(OmniBoundingVolume())
+        self.cockpit.node().setFinal(True)
 
         bounds = self.thirdPersonShip.getTightBounds()
         self.thirdPersonWidth = bounds[1][1] - bounds[0][1]
