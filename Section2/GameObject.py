@@ -280,6 +280,20 @@ class ShieldedObject():
         self.shields = []
         self.shieldDuration = 0.5
 
+        shield = section2Models["shield.egg"].copy_to(self.root)
+        tex = shield.findTexture(TextureStage.getDefault())
+        tex.setWrapV(Texture.WM_clamp)
+        # shield.setScale(self.size*self.shieldScalar)
+        # shield.setColorScale(self.colour)
+        shield.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd, ColorBlendAttrib.OIncomingAlpha, ColorBlendAttrib.OOne))
+        # shield.lookAt(common.base.render,
+        #               self.root.getPos(common.base.render) + incomingImpulse)
+        shield.setBin("unsorted", 1)
+        shield.setDepthWrite(False)
+        shield.setTwoSided(True)
+        shield.setShaderAuto(1)
+        self.shields.append([shield, 0])
+
     def alterHealth(self, dHealth, incomingImpulse, knockback, flinchValue, overcharge = False):
         if dHealth < 0 and incomingImpulse is not None and self.health > 0:
             shield = section2Models["shield.egg"].copy_to(self.root)
