@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "Captain Panda--Across the Night",
-    version = "1.0.3",
+    version = "1.0.4",
     options = {
         "build_apps" : {
             "include_patterns" : [
@@ -44,7 +44,7 @@ setup(
                 "p3openal_audio",
             ],
             "platforms" : [
-                "manylinux1_x86_64",
+                "manylinux2014_x86_64",
                 #"macosx_10_6_x86_64",
                 "win_amd64"
             ],
